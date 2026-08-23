@@ -65,6 +65,8 @@
   if(window.appamadaBlockedReferrer){document.title="Access denied";document.body.innerHTML='<main class="shell"><section class="guide-section"><h1>Access denied</h1><p>この参照元からのアクセスは許可されていません。</p></section></main>';document.documentElement.classList.remove("blocked-referrer");return;}
   const body=document.getElementById("table-body"), nav=document.getElementById("level-nav");
   const text=(v)=>String(v??"");
+  const monthNumber=Object.freeze({Jan:"01",Feb:"02",Mar:"03",Apr:"04",May:"05",Jun:"06",Jul:"07",Aug:"08",Sep:"09",Oct:"10",Nov:"11",Dec:"12"});
+  const comment=(v)=>{const value=text(v);const match=value.match(/^(?:Sun|Mon|Tue|Wed|Thu|Fri|Sat) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) (\d{1,2}) (\d{4}) \d{2}:\d{2}:\d{2} GMT[+-]\d{4}(?: \([^)]*\))?$/);return match?`${match[3]}/${monthNumber[match[1]]}/${match[2].padStart(2,"0")}`:value;};
   const md5=(v)=>text(v).trim().toLowerCase();
   const isValidMd5=(v)=>/^[0-9a-f]{32}$/.test(v);
   const safeId=(level)=>"level-"+encodeURIComponent(level).replace(/%/g,"-");
@@ -85,7 +87,7 @@
       const id=safeId(group.level);
       const chip=document.createElement("a");chip.className="level-chip";chip.href="#"+id;chip.textContent=mark+group.level;nav.appendChild(chip);
       const sep=document.createElement("tr");sep.className="level-divider";sep.id=id;const cell=document.createElement("td");cell.colSpan=4;cell.append(document.createTextNode(mark+group.level));const count=document.createElement("span");count.className="level-count";count.textContent=`(${group.items.length}譜面)`;cell.appendChild(count);sep.appendChild(cell);frag.appendChild(sep);
-      for(const item of group.items){const tr=document.createElement("tr");tr.classList.add("data-row",stripeIndex%2===0?"data-row-white":"data-row-gray");stripeIndex++;tr.appendChild(td("level-cell",mark+group.level));const title=document.createElement("td");title.className="title-cell";const itemMd5=md5(item.md5);if(isValidMd5(itemMd5)){const a=document.createElement("a");a.href="https://bms-ir.org/new/song?songmd5="+encodeURIComponent(itemMd5);a.target="_blank";a.rel="noopener noreferrer";a.textContent=text(item.title);title.appendChild(a)}else{title.textContent=text(item.title)}tr.appendChild(title);tr.appendChild(td("artist-cell",item.artist));tr.appendChild(td("comment-cell",item.comment));frag.appendChild(tr)}
+      for(const item of group.items){const tr=document.createElement("tr");tr.classList.add("data-row",stripeIndex%2===0?"data-row-white":"data-row-gray");stripeIndex++;tr.appendChild(td("level-cell",mark+group.level));const title=document.createElement("td");title.className="title-cell";const itemMd5=md5(item.md5);if(isValidMd5(itemMd5)){const a=document.createElement("a");a.href="https://bms-ir.org/new/song?songmd5="+encodeURIComponent(itemMd5);a.target="_blank";a.rel="noopener noreferrer";a.textContent=text(item.title);title.appendChild(a)}else{title.textContent=text(item.title)}tr.appendChild(title);tr.appendChild(td("artist-cell",item.artist));tr.appendChild(td("comment-cell",comment(item.comment)));frag.appendChild(tr)}
     }
     body.appendChild(frag);document.getElementById("chart-count").textContent=info.length.toLocaleString("ja-JP");document.getElementById("level-count").textContent=groups.length.toLocaleString("ja-JP");
   }
